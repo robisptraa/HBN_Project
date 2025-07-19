@@ -7,6 +7,9 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Exports\OrdersExport;
+use App\Exports\ComplaintExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -30,6 +33,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
     Route::post('/orders/{order}/verify', [OrderController::class, 'verify'])->name('orders.verify');
     Route::post('/orders/{order}/reject', [OrderController::class, 'reject'])->name('orders.reject');
+    Route::get('/orders/export', function () {
+        return Excel::download(new OrdersExport, 'orders.xlsx');
+    })->name('orders.export');
+    Route::get('/complaints/export', function () {
+    return Excel::download(new ComplaintExport, 'complaints.xlsx');
+})->middleware(['auth', 'role:admin'])->name('complaints.export');
 });
 
 require __DIR__ . '/auth.php';
